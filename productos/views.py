@@ -3,18 +3,24 @@ from rest_framework.response import Response
 from rest_framework import status
 from productos.models import Productos
 from productos.serializers import ProductSerializer
-from rest_framework.authentication import SessionAuthentication, BasicAuthentication 
 from rest_framework.permissions import IsAuthenticated
 
-# Create your views here.
-
-
-class ProductApiView(APIView):
+class TodosLosProductos(APIView):
 
     def get(self, request, *args, **kwargs):
         product = Productos.objects.all()
         serializer = ProductSerializer(product, many = True)
-        return Response(serializer.data, status = status.HTTP_200_OK)
+        return Response(serializer.data, status = status.HTTP_200_OK)    
+
+class AgregarProducto(APIView):
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        product = Productos.objects.all()
+        serializer = ProductSerializer(product, many = True)
+        total = len(serializer.data)
+        return Response({'Message': {'Catidad de productos': total}}, status = status.HTTP_200_OK)
 
     def post(self, request, *args, **kwargs):
         data = {
@@ -32,25 +38,28 @@ class ProductApiView(APIView):
                 serializer.save()
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
             else:
-                return Response(serializer.errors, status=status.HTTP_401_UNAUTHORIZED)     
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)     
+                return Response({'Message': 'Debes estar autenticado para realizar esta operación'}, status=status.HTTP_401_UNAUTHORIZED)     
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)   
+class ProductoPorId(APIView):
 
-
-class ProductDetailApiView(APIView):
     permission_classes = [IsAuthenticated]
+
     def get_objects(self, id):
-        try:
-            return Productos.objects.get(id=id)
-        except Productos.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-
+        res = Productos.objects.get(id=id)
+        if res:
+            return res
+        else:
+            return Response({'Message': 'Producto no existe'}, status=status.HTTP_400_BAD_REQUEST)
+       
     def get(self, request, id_producto, *args, **kwargs):
-        instancia_producto = self.get_objects(id_producto)
-        if not instancia_producto:
-            return Response( {"res": "Producto no existe..."}, status=status.HTTP_400_BAD_REQUEST)
+        instancia_producto = Productos.objects.get(id = id_producto)
+        print(instancia_producto)
+        if instancia_producto:
+            serializer = ProductSerializer(instancia_producto)
+            return Response(serializer.data, status=status.HTTP_200_OK)  
+        else:
+            return Response({'Message': 'Producto no existe'}, status=status.HTTP_400_BAD_REQUEST)
 
-        serializer = ProductSerializer(instancia_producto)
-        return Response(serializer.data, status=status.HTTP_200_OK)  
 
     def put(self, request, id_producto, *args, **kwargs):
         instancia_producto = self.get_objects(id_producto)
@@ -76,6 +85,6 @@ class ProductDetailApiView(APIView):
     def delete(self, request, id_producto, *args, **kwargs):
         instancia_producto = self.get_objects(id_producto)
         if not instancia_producto:
-            return Response({"res": "Object with todo id does not exists"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"Message": "Producto no existe..."}, status=status.HTTP_400_BAD_REQUEST)
         instancia_producto.delete()
-        return Response({"res": "Object deleted!"}, status=status.HTTP_204_NO_CONTENT)
+        return Response({"Message": "Producto eliminado..."}, status=status.HTTP_204_NO_CONTENT)

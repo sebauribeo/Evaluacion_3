@@ -1,7 +1,8 @@
-from django.urls import path, include
-from .views import ProductApiView, ProductDetailApiView
+from django.urls import path
+from .views import TodosLosProductos, ProductoPorId, AgregarProducto
 
 urlpatterns = [
-    path('v1/', ProductApiView.as_view()),
-    path('v1/<int:id_producto>/', ProductDetailApiView.as_view())
+    path('v1/', TodosLosProductos.as_view()),
+    path('v1/agregarProducto/', AgregarProducto.as_view()),
+    path('v1/<int:id_producto>/', ProductoPorId.as_view())
 ]
