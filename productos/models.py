@@ -10,6 +10,7 @@ class Productos(models.Model):
         marca = models.CharField(null = False, max_length = 100)
         stock = models.IntegerField()
         precio = models.IntegerField()
+        usuario = models.ForeignKey(User, on_delete=models.CASCADE, null = True)
 
         class Meta:
             ordering = ['id']
