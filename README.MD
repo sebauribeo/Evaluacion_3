@@ -1,8 +1,8 @@
 ## RUTAS
 
-TODOS LOS PRODUCTOS => http://localhost:8000/api/v1
-AGREGAR PRODUCTO => http://localhost:8000/api/v1/agregarProducto
-PRODUCTO POR ID => http://localhost:8000/api/v1/<:id>
+todos los productos => http://localhost:8000/api/v1
+agregar producto => http://localhost:8000/api/v1/agregarProducto
+producto por id => http://localhost:8000/api/v1/<:id>
 
 ## USUARIOS PARA TEST
 
